@@ -1,179 +1,234 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-    <title>Hymora_ - Twitch Streamer</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hymora Custom Player</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --primary-color: #ffffff;
-            --secondary-color: #b3b3b3;
-            --accent-color: #8a63ff;
-            --gradient: linear-gradient(90deg, #8a63ff, #4ecdc4);
-        }
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #141416 0%, #0c0c0e 100%);
+      font-family: "Poppins", sans-serif;
+      color: #fff;
+    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--primary-color);
-            overflow-x: hidden;
-            line-height: 1.7;
-        }
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
-            background: transparent; padding: 1.5rem 5%;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: all 0.3s ease;
-        }
-        header.scrolled {
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            padding: 1rem 5%;
-        }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(20,20,25,0.85);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 5;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
 
-        .logo a {
-            font-size: 1.7rem; font-weight: 700; text-decoration: none;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      text-shadow: 0 0 10px #6e57ff;
+      letter-spacing: 2px;
+    }
 
-        nav ul {
-            list-style: none; display: flex; gap: 2rem;
-        }
-        nav a {
-            text-decoration: none; color: var(--secondary-color); font-weight: 500;
-            position: relative; transition: color 0.3s;
-        }
-        nav a::after {
-            content: ''; position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%);
-            width: 0; height: 2px; background: var(--gradient); transition: width 0.3s;
-        }
-        nav a:hover { color: var(--primary-color); }
-        nav a:hover::after { width: 100%; }
+    #editBtn {
+      background: #6e57ff;
+      border: none;
+      color: white;
+      font-size: 20px;
+      border-radius: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(110, 87, 255, 0.5);
+      transition: 0.3s;
+    }
+    #editBtn:hover {
+      background: #8a72ff;
+      transform: scale(1.05);
+    }
 
-        section { padding: 100px 8%; text-align: center; opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
-        section.show { opacity: 1; transform: translateY(0); }
+    .container {
+      position: relative;
+      top: 70px;
+      height: calc(100vh - 80px);
+      width: 100%;
+    }
 
-        #hero {
-            min-height: 100vh;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            text-align: center; padding: 0 5%;
-        }
+    .window {
+      position: absolute;
+      background: #1b1c20;
+      border: 1px solid #2a2b31;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+      resize: none; /* domyślnie zablokowane */
+      pointer-events: auto;
+    }
 
-        #hero h1 {
-            font-size: 4rem; font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        #hero p { color: var(--secondary-color); font-size: 1.3rem; margin-top: 1rem; }
+    .title-box {
+      font-size: 18px;
+      text-align: center;
+      padding: 6px;
+      background: #2a2b31;
+      user-select: none;
+      color: #b6b6ff;
+      border-bottom: 1px solid #3a3b41;
+      cursor: default; /* nie można przesuwać dopóki nie edytujemy */
+    }
 
-        h2 { font-size: 2.4rem; margin-bottom: 1rem; text-transform: uppercase; }
-        .line { width: 80px; height: 4px; background: var(--gradient); margin: 0 auto 2rem auto; border-radius: 2px; }
-        p { color: var(--secondary-color); max-width: 800px; margin: 0 auto; font-size: 1.05rem; }
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
 
-        .social-links a {
-            display: inline-flex; align-items: center; justify-content: center;
-            background: var(--accent-color);
-            padding: 1rem 2rem; margin: 1rem;
-            border-radius: 50px; text-decoration: none;
-            color: #fff; font-weight: 600; font-size: 1.1rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .social-links a:hover { transform: translateY(-5px); box-shadow: 0 0 20px rgba(138,99,255,0.6); }
-        .social-links a i { margin-right: 1rem; }
-
-        footer { text-align: center; padding: 2rem; background: #0c0c0c; color: var(--secondary-color); font-size: 0.9rem; }
-
-        @media (max-width: 768px) {
-            nav ul { display: none; }
-            #hero h1 { font-size: 2.8rem; }
-        }
-    </style>
+    /* domyślne pozycje */
+    #playerWin {
+      left: 5%;
+      top: 5%;
+      width: 60%;
+      height: 80%;
+    }
+    #chatWin {
+      right: 5%;
+      top: 10%;
+      width: 25%;
+      height: 70%;
+    }
+  </style>
 </head>
+
 <body>
+  <header>
+    <h1>Hymora Live</h1>
+    <button id="editBtn">✏️ Edytor</button>
+  </header>
 
-    <header id="header">
-        <div class="logo"><a href="#hero">Hymora_</a></div>
-        <nav>
-            <ul>
-                <li><a href="#o-mnie">O mnie</a></li>
-                <li><a href="#sociale">Sociale</a></li>
-            </ul>
-        </nav>
-    </header>
+  <div class="container">
+    <div class="window" id="playerWin">
+      <div class="title-box">🎥 Stream</div>
+      <iframe src="https://player.twitch.tv/?channel=hymora_&parent=vkamix11.github.io" allowfullscreen></iframe>
+    </div>
 
-    <section id="hero">
-        <h1>Hymora_</h1>
-        <p>Streamer z Wrocławia — pozytywna energia, humor i dobra zabawa na Twitchu 🎮</p>
-        <div class="social-links">
-            <a href="https://www.twitch.tv/hymora_" target="_blank"><i class="fab fa-twitch"></i> Oglądaj na Twitchu</a>
-        </div>
-    </section>
+    <div class="window" id="chatWin">
+      <div class="title-box">💬 Chat</div>
+      <iframe src="https://www.twitch.tv/embed/hymora_/chat?parent=vkamix11.github.io"></iframe>
+    </div>
+  </div>
 
-    <section id="o-mnie">
-        <h2>O MNIE</h2>
-        <div class="line"></div>
-        <p>
-            Nazywam się Filip i wychodzę ze swojej strefy komfortu, publikując swoją japę w internecie xD.<br><br>
-            Gram głównie w gry, ale planuję rozwijać się dalej i próbować nowych rzeczy — może vlogi, może IRL, kto wie?<br>
-            Jeśli lubisz chillowe streamy, poczucie humoru i autentyczność — dobrze trafiłeś!
-        </p>
-    </section>
+  <script>
+    const editBtn = document.getElementById("editBtn");
+    let editMode = false;
 
-    <section id="sociale">
-        <h2>ZNJDŹ MNIE</h2>
-        <div class="line"></div>
-        <p>Obserwuj mnie, żeby być na bieżąco ze streamami i nowościami!</p>
-        <div class="social-links">
-            <a href="https://www.twitch.tv/hymora_" target="_blank"><i class="fab fa-twitch"></i>Twitch</a>
-        </div>
-    </section>
+    const windows = document.querySelectorAll(".window");
 
-    <footer>
-        <p>© 2025 Hymora_ (Filip) — Wrocław. Wszelkie prawa zastrzeżone.</p>
-    </footer>
+    function disableEditing() {
+      windows.forEach(win => {
+        win.style.resize = "none";
+        win.querySelector(".title-box").style.cursor = "default";
+      });
+    }
 
-    <script>
-        const header = document.getElementById('header');
-        window.addEventListener('scroll', () => {
-            header.classList.toggle('scrolled', window.scrollY > 50);
-        });
+    function enableEditing() {
+      windows.forEach(win => {
+        win.style.resize = "both";
+        win.querySelector(".title-box").style.cursor = "move";
+      });
+    }
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('show');
-                }
-            });
-        }, { threshold: 0.2 });
+    disableEditing();
 
-        document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+    editBtn.addEventListener("click", () => {
+      editMode = !editMode;
+      if (editMode) {
+        editBtn.textContent = "✅ Zapisz układ";
+        enableEditing();
+      } else {
+        editBtn.textContent = "✏️ Edytor";
+        disableEditing();
+        saveLayout();
+      }
+    });
 
-        document.querySelectorAll('nav a, .logo a').forEach(link => {
-            link.addEventListener('click', e => {
-                e.preventDefault();
-                const target = document.querySelector(link.getAttribute('href'));
-                if (target) {
-                    window.scrollTo({
-                        top: target.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    </script>
+    windows.forEach(win => {
+      const title = win.querySelector(".title-box");
+      let offsetX, offsetY, dragging = false;
+
+      title.addEventListener("mousedown", e => {
+        if (!editMode) return;
+        dragging = true;
+        offsetX = e.clientX - win.offsetLeft;
+        offsetY = e.clientY - win.offsetTop;
+        win.style.opacity = "0.85";
+      });
+
+      document.addEventListener("mouseup", () => {
+        dragging = false;
+        windows.forEach(w => (w.style.opacity = "1"));
+      });
+
+      document.addEventListener("mousemove", e => {
+        if (dragging && editMode) {
+          win.style.left = (e.clientX - offsetX) + "px";
+          win.style.top = (e.clientY - offsetY) + "px";
+        }
+      });
+    });
+
+    function saveLayout() {
+      const layout = {};
+      windows.forEach(win => {
+        layout[win.id] = {
+          left: win.style.left,
+          top: win.style.top,
+          width: win.style.width,
+          height: win.style.height
+        };
+      });
+      localStorage.setItem("hymoraLayout", JSON.stringify(layout));
+    }
+
+    window.addEventListener("load", () => {
+      const saved = localStorage.getItem("hymoraLayout");
+      if (saved) {
+        const layout = JSON.parse(saved);
+        for (let id in layout) {
+          const win = document.getElementById(id);
+          if (win && layout[id]) {
+            win.style.left = layout[id].left;
+            win.style.top = layout[id].top;
+            win.style.width = layout[id].width;
+            win.style.height = layout[id].height;
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>
+
